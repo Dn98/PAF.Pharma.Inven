@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Store</title>
+  <script src="./js/axios.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Quicksand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+
+<body>
+	<div class="topic">Update store</div>
+	<form class="cus_form" id="validate_form">
+		<input 
+		class="cus_input" 
+		id="tmed_generic_name" 
+		type="text" 
+		placeholder="Generic name"
+		data-parsley-maxlength="20" 
+		required
+		data-parsley-trigger="keyup focusout"
+		data-parsley-maxlength-message="Maximum Length Reached"
+		/>
+		
+		<input 
+		class="cus_input" 
+		id="tmed_brand_name" 
+		type="text" 
+		placeholder="Brand name"
+		data-parsley-maxlength="20" 
+		data-parsley-trigger="keyup focusout"
+		required
+		data-parsley-maxlength-message="Maximum Length Reached"
+		/>
+		
+		<input 
+		class="cus_input" 
+		id="tmed_expiration_date" 
+		type="date" 
+		required
+		placeholder="Expiration date"
+		value=""
+		/>
+		
+		<input 
+		class="cus_input" 
+		id="tmed_unit_price" 
+		type="text" 
+		placeholder="Unit price" 
+		required
+		data-parsley-trigger="keyup focusout"
+		data-parsley-pattern="^[1-9]\d*(\.\d+)?$" 
+		placeholder="Unit price"
+		/>
+		
+		<input 
+		class="cus_input" 
+		id="tmed_quantity" 
+		type="number" 
+		required
+		placeholder="Quantity" 
+		data-parsley-pattern="^[1-9]+[0-9]*$"
+		data-parsley-trigger="keyup focusout"
+		data-parsley-error-message="This field is required and only positive values accepted"
+		/>
+	</form>
+	<div class="btn_cover">
+		<div class="editStock" onclick="updateMedicine()">Edit</div>
+	</div>
+	<div class="ErrorMessage" id="cusError"></div>
+	<div id="error_msg"></div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="js/parsley.js"></script>
+	<script>
+		$('#validate_form').parsley();
+	    getAmedicine();
+	    function getAmedicine() {
+	      axios({
+	        method: 'get',
+	        url: 'http://localhost:8080/final/rest/medicine/'+ sessionStorage.getItem("id")
+	      }).then(function(response) {
+	        var finaldata = response.data.Data;
+	        var finalerror = response.data.Error;
+	        if (finalerror.error_code == 0) {
+	        	document.getElementById("tmed_generic_name").value = finaldata.generic_name;
+	        	document.getElementById("tmed_brand_name").value = finaldata.brand_name;
+	        	document.getElementById("tmed_expiration_date").value = finaldata.expiration_date;
+	        	document.getElementById("tmed_unit_price").value = finaldata.unit_price;
+	        	document.getElementById("tmed_quantity").value = finaldata.quantity;
+	        } else {
+	        	document.getElementById("cusError").innerHTML = "Something Went Wrong";
+	        }
+	      }).catch(function(error) {
+	    	  document.getElementById("cusError").innerHTML = "Something Went Wrong";
+	      });
+	    }
+	
+	    function updateMedicine() {
+	    	$('#validate_form').parsley().validate();
+	    	if ($('#validate_form').parsley().isValid()) {
+			axios.put('http://localhost:8080/final/rest/medicine', {
+			   "id": sessionStorage.getItem("id"),
+			   "generic_name": document.getElementById("tmed_generic_name").value,
+			   "brand_name": document.getElementById("tmed_brand_name").value,
+			   "expiration_date": document.getElementById("tmed_expiration_date").value,
+			   "unit_price": document.getElementById("tmed_unit_price").value,
+			   "quantity": document.getElementById("tmed_quantity").value
+			 }).then(function(response) {
+				alert("Data updated");
+				window.location.href = "pharmacist.html";
+			 }).catch(function(error) {
+				 alert("Something went wrong. Try it later!");
+			 });
+			
+	    	}else{
+	    		alert("Validation Error Encounterd");
+	    	}
+	    }
+	</script>
+</body>
+
+</html>
