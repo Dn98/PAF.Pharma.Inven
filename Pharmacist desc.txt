@@ -1,0 +1,4 @@
+This is the my part pharmacist.
+
+This is with the admin login page.
+In here pharmacist can View, Add, Update, Delete the medicines.
